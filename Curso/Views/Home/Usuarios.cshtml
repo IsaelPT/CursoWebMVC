@@ -1,0 +1,134 @@
+﻿@model List<Usuario>
+
+<ol class="breadcrumb mb-4 mt-3">
+    <li class="breadcrumb-item"><a href="index.html">Resumen</a></li>
+    <li class="breadcrumb-item active">Usuarios</li>
+</ol>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-users me-1"></i> Lista de Usuarios
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-success" onclick="abrirModal()">Crear Nuevo</button>
+            </div>
+        </div>
+        <hr />
+        <table id="table" class="display cell-border" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>Correo</th>
+                    <th>Activo</th>
+                    <th width="90px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @* @foreach(var user in Model) *@
+                @for(int i=0;i<Model.Count;i++)
+                {
+                    var user = Model[i];
+                    <tr>
+                        <td>@Html.DisplayFor(m => user.Nombres)</td>
+                        <td>@Html.DisplayFor(m => user.Apellidos)</td>
+                        <td>@Html.DisplayFor(m => user.Correro)</td>
+                        <td>@if((bool)user.Activo)
+                        {
+                            <span class="badge bg-success">Si</span>
+                        }else{
+                            <span class="badge  bg-danger">No</span>
+                        }
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm btn-editar" data-index="@i"><i class="fas fa-pen"></i></button>
+                            <button type="button" class="btn btn-danger btn-sm ms-2"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="exampleModalLabel">Usuario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body g-2">
+                <div class="row">
+
+                    <input id="txtId" type="hidden"/>
+
+                    <div class="col-sm-6">
+                        <label for="txtNombres" class="form-label">Nombres</label>
+                        <input type="text" class="form-control" id="txtNombres">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtApellidos" class="form-label">Apellidos</label>
+                        <input type="text" class="form-control" id="txtApellidos"">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="txtCorreo" class="form-label">Correo</label>
+                        <input type="email" class="form-control" id="txtCorreo" placeholder="name@example.com">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="Activo" class="form-label">Activo</label>
+                        <select class="form-select" id="Activo">
+                            <option value="1">Si</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        function abrirModal(usuario){
+
+            $('#txtId').val(0)
+            $('#txtNombres').val('')
+            $('#txtApellidos').val('')
+            $('#txtCorreo').val('')
+            $('#Activo').val(1)
+
+            if(usuario != null){
+                $('#txtId').val(usuario.IdUsuario)
+                $('#txtNombres').val(usuario.Nombres)
+                $('#txtApellidos').val(usuario.Apellidos)
+                $('#txtCorreo').val(usuario.Correro)
+                $('#Activo').val(usuario.Activo == true ? 1 : 0)
+            }
+
+            $('#FormModal').modal('show');
+
+        }
+
+        $("#table tbody").on("click", '.btn-editar', function () {
+            var indice = $(this).data("index");
+            var usuarios = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+            abrirModal(usuarios[indice]);
+            
+        })
+
+
+    </script>
+}

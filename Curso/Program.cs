@@ -1,7 +1,14 @@
+using Curso.Models;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<DbcarritoContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CarritoContext"));
+});
 
 var app = builder.Build();
 
