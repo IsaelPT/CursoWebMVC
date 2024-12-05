@@ -1,3 +1,4 @@
+using Curso;
 using Curso.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ builder.Services.AddDbContext<DbcarritoContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("CarritoContext"));
 });
+builder.Services.AddScoped<IMyService, MyService>();
 
 var app = builder.Build();
 
