@@ -51,7 +51,7 @@ namespace Curso
                         Direction = System.Data.ParameterDirection.Output,
                     };
 
-                    _context.Database.ExecuteSqlRaw("SELECT sp_RegistrarUsuario @Nombres,@Apellidos,@Correo,@Clave,@Activo,@Mensaje output,@Resultado output",
+                    _context.Database.ExecuteSqlRaw("EXEC sp_RegistrarUsuario @Nombres, @Apellidos, @Correo, @Clave, @Activo, @Mensaje OUTPUT, @Resultado OUTPUT",
                         new SqlParameter("@Nombres", obj.Nombres),
                         new SqlParameter("@Apellidos", obj.Apellidos),
                         new SqlParameter("@Correo", obj.Correro),
@@ -61,9 +61,9 @@ namespace Curso
                         resultado
                         );
 
-                    mensaje = pmensaje.ToString();
+                    mensaje = pmensaje.Value.ToString();
 
-                    return Convert.ToInt32(resultado);
+                    return Convert.ToInt32(resultado.Value);
                 }
                 catch (Exception ex)
                 {
@@ -112,7 +112,7 @@ namespace Curso
                         Direction = System.Data.ParameterDirection.Output,
                     };
 
-                    _context.Database.ExecuteSqlRaw("SELECT sp_EditarUsuario @Nombres,@Apellidos,@Correo,@IdUsuario,@Activo,@Mensaje output,@Resultado output",
+                    _context.Database.ExecuteSqlRaw("EXEC sp_EditarUsuario @Nombres,@Apellidos,@Correo,@IdUsuario,@Activo,@Mensaje output,@Resultado output",
                         new SqlParameter("@Nombres", obj.Nombres),
                         new SqlParameter("@Apellidos", obj.Apellidos),
                         new SqlParameter("@Correo", obj.Correro),
@@ -122,9 +122,9 @@ namespace Curso
                         resultado
                     );
 
-                    mensaje = pmensaje.ToString();
+                    mensaje = pmensaje.Value.ToString();
 
-                    return Convert.ToBoolean(resultado);
+                    return Convert.ToBoolean(resultado.Value);
                 }
                 catch (Exception ex)
                 {
@@ -142,7 +142,7 @@ namespace Curso
 
         public bool EliminarUsuario(int id, out string mensaje)
         {
-            var resultado = false
+            var resultado = false;
             mensaje = string.Empty;
 
             try
@@ -151,11 +151,13 @@ namespace Curso
                 if (usuario == null)
                 {
                     resultado = false;
+                    mensaje = "Usuario no existe";
                 }
                 else
                 {
                     _context.Usuarios.Remove(usuario);
                     _context.SaveChanges();
+                    mensaje = "Usuario eliminado con exito";
                     resultado = true;
                 }
             }

@@ -10,7 +10,8 @@ builder.Services.AddDbContext<DbcarritoContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("CarritoContext"));
 });
-builder.Services.AddScoped<IMyService, MyService>();
+//builder.Services.AddScoped<IMyService, MyService>();
+builder.Services.AddTransient<MyService>();
 
 var app = builder.Build();
 

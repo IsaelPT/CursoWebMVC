@@ -44,8 +44,10 @@
                         }
                         </td>
                         <td>
-                            <button type="button" class="btn btn-primary btn-sm btn-editar" data-index="@i"><i class="fas fa-pen"></i></button>
-                            <button type="button" class="btn btn-danger btn-sm ms-2"><i class="fas fa-trash"></i></button>
+                            <button type="button" class="btn btn-primary btn-sm btn-editar" data-index="@user.IdUsuario"><i class="fas fa-pen"></i></button>
+                            <button type="button" class="btn btn-danger btn-sm ms-2 btn-borrar" data-index="@user.IdUsuario"><i class="fas fa-trash"></i>
+
+                    </button>
                         </td>
                     </tr>
                 }
@@ -62,24 +64,24 @@
                 <h5 class="modal-title" id="exampleModalLabel">Usuario</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body g-2">
-                <div class="row">
+            <div class="modal-body">
+                <div class="row  g-2">
 
                     <input id="txtId" type="hidden"/>
 
                     <div class="col-sm-6">
                         <label for="txtNombres" class="form-label">Nombres</label>
-                        <input type="text" class="form-control" id="txtNombres">
+                        <input type="text" class="form-control" id="txtNombres" autocomplete="off">
                     </div>
 
                     <div class="col-sm-6">
                         <label for="txtApellidos" class="form-label">Apellidos</label>
-                        <input type="text" class="form-control" id="txtApellidos"">
+                        <input type="text" class="form-control" id="txtApellidos" autocomplete="off">
                     </div>
 
                     <div class="col-sm-6">
                         <label for="txtCorreo" class="form-label">Correo</label>
-                        <input type="email" class="form-control" id="txtCorreo" placeholder="name@example.com">
+                        <input type="email" class="form-control" id="txtCorreo" placeholder="name@example.com" autocomplete="off">
                     </div>
 
                     <div class="col-sm-6">
@@ -90,10 +92,17 @@
                         </select>
                     </div>
                 </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div id="mensajeError" class="alert alert-danger" role="alert">
+
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar</button>
+                <button type="button" class="btn btn-success" onclick="guardar()">Guardar</button>
             </div>
         </div>
     </div>
@@ -109,6 +118,7 @@
             $('#txtApellidos').val('')
             $('#txtCorreo').val('')
             $('#Activo').val(1)
+            $('#mensajeError').hide()
 
             if(usuario != null){
                 $('#txtId').val(usuario.IdUsuario)
@@ -122,11 +132,87 @@
 
         }
 
+        function guardar() {
+            const id = $('#txtId').val();
+            const nombres = $('#txtNombres').val();
+            const apellidos = $('#txtApellidos').val();
+            const correo = $('#txtCorreo').val();
+            const activo = $('#Activo').val() === "1";
+
+            const usuario = {
+                IdUsuario: id,
+                Nombres: nombres,
+                Apellidos: apellidos,
+                Correro: correo,
+                Activo: activo
+            };
+
+            const url = id == 0 ? '@Url.Action("CrearUsuario", "Home")' : '@Url.Action("ActualizarUsuario", "Home")';
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                contentType: "application/json",
+                data: JSON.stringify(usuario),
+                success: function (response) {
+                    $(".modal-body").LoadingOverlay("hide")
+                    $('#FormModal').modal('hide');
+                    location.reload(); // Recargar la página para ver los cambios
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    $(".modal-body").LoadingOverlay("hide")
+                    $('#mensajeError').text(xhr.responseJSON.message)
+                    $('#mensajeError').show();
+                },
+                beforeSend: function(){
+ 
+                    $(".modal-body").LoadingOverlay("show",{
+                        imageResizeFactor: 2,
+                        text: "Cagando....",
+                        size: 14
+                    })
+                }
+            });
+        }
+
         $("#table tbody").on("click", '.btn-editar', function () {
-            var indice = $(this).data("index");
+            var id = $(this).data("index");
             var usuarios = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
-            abrirModal(usuarios[indice]);
+            var filter_user = usuarios.filter(function(item) {
+                return item.IdUsuario === id;
+            })
+            abrirModal(filter_user[0]);
             
+        })
+
+        $("#table tbody").on("click", '.btn-borrar', function () {
+            var id = $(this).data("index");
+            swal({
+                title: "Estas Seguro?",
+                text: "Desea eliminar el Usuario?",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonClass: "btn-danger",
+                confirmButtonClass: "btn-primary",
+                confirmButtonText: "Si",
+                cancelButtonText: "No",
+                closeOnConfirm: true
+            },
+            function(){
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("EliminarUsuario", "Home")',
+                    contentType: "application/json",
+                    data: JSON.stringify(id),
+                    success: function (response) {
+                        location.reload(); //Recargar la página para ver los cambios
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.log(xhr.responseJSON.message);
+                    }
+                });
+
+            });
         })
 
 
