@@ -1,5 +1,198 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@model List<Marca>
+
+<ol class="breadcrumb mb-4 mt-3">
+    <li class="breadcrumb-item"><a href="index.html">Mantenimiento</a></li>
+    <li class="breadcrumb-item active">Categorias</li>
+</ol>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-users me-1"></i> Lista de Marcas
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button type="button" class="btn btn-success" onclick="abrirModal()">Crear Nuevo</button>
+            </div>
+        </div>
+        <hr />
+        <table id="table" class="display cell-border" style="width:100%">
+            <thead>
+                <tr>
+                    <th>Descripcion</th>
+                    <th>Activo</th>
+                    <th width="90px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @* @foreach(var user in Model) *@
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var marca = Model[i];
+                    <tr>
+                        <td>@Html.DisplayFor(m => marca.Descripcion)</td>
+                        <td>
+                            @if ((bool)marca.Activo)
+                            {
+                                <span class="badge bg-success">Si</span>
+                            }
+                            else
+                            {
+                                <span class="badge  bg-danger">No</span>
+                            }
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm btn-editar" data-index="@marca.IdMarca"><i class="fas fa-pen"></i></button>
+                            <button type="button" class="btn btn-danger btn-sm ms-2 btn-borrar" data-index="@marca.IdMarca"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="FormModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title" id="exampleModalLabel">Marcas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row  g-1">
+
+                    <input id="txtId"  />
+
+                    <div class="col-sm-6">
+                        <label for="txtDescripcion" class="form-label">Descripcion</label>
+                        <input type="text" class="form-control" id="txtDescripcion" autocomplete="off">
+                    </div>
+
+                    <div class="col-sm-6">
+                        <label for="Activo" class="form-label">Activo</label>
+                        <select class="form-select" id="Activo">
+                            <option value="1">Si</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div id="mensajeError" class="alert alert-danger" role="alert">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" onclick="guardar()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        function abrirModal(usuario){
+
+            $('#txtId').val(0)
+            $('#txtDescripcion').val('')
+            $('#Activo').val(1)
+            $('#mensajeError').hide()
+
+            if(usuario != null){
+                $('#txtId').val(usuario.IdMarca)
+                $('#txtDescripcion').val(usuario.Descripcion)
+                $('#Activo').val(usuario.Activo == true ? 1 : 0)
+            }
+
+            $('#FormModal').modal('show');
+
+        }
+
+        function guardar() {
+            const id = $('#txtId').val();
+            const descripcion = $('#txtDescripcion').val();
+            const activo = $('#Activo').val() === "1";
+
+            const marca = {
+                IdMarca: id,
+                Descripcion: descripcion,
+                Activo: activo
+            };
+
+            const url = id == 0 ? '@Url.Action("CrearMarca", "Mantenedor")' : '@Url.Action("ActualizarMarca", "Mantenedor")';
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                contentType: "application/json",
+                data: JSON.stringify(marca),
+                success: function (response) {
+                    $(".modal-body").LoadingOverlay("hide")
+                    $('#FormModal').modal('hide');
+                    location.reload(); // Recargar la página para ver los cambios
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    $(".modal-body").LoadingOverlay("hide")
+                    $('#mensajeError').text(xhr.responseJSON.message)
+                    $('#mensajeError').show();
+                },
+                beforeSend: function(){
+
+                    $(".modal-body").LoadingOverlay("show",{
+                        imageResizeFactor: 2,
+                        text: "Cagando....",
+                        size: 14
+                    })
+                }
+            });
+        }
+
+        $("#table tbody").on("click", '.btn-editar', function () {
+            var id = $(this).data("index");;
+            var marcas = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+            var filter_user = marcas.filter(function(item) {
+                return item.IdMarca === id;
+            })
+            abrirModal(filter_user[0]);
+
+        })
+
+        $("#table tbody").on("click", '.btn-borrar', function () {
+            var id = $(this).data("index");
+            swal({
+                title: "Estas Seguro?",
+                text: "Desea eliminar la Categoria?",
+                type: "warning",
+                showCancelButton: true,
+                cancelButtonClass: "btn-danger",
+                confirmButtonClass: "btn-primary",
+                confirmButtonText: "Si",
+                cancelButtonText: "No",
+                closeOnConfirm: true
+            },
+            function(){
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("EliminarMarca", "Mantenedor")',
+                    contentType: "application/json",
+                    data: JSON.stringify(id),
+                    success: function (response) {
+                        location.reload(); //Recargar la página para ver los cambios
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        console.log(xhr.responseJSON.message);
+                    }
+                });
+
+            });
+        })
+
+
+    </script>
 }

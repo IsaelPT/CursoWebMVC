@@ -23,6 +23,7 @@ namespace Curso.Controllers
             return View();
         }
 
+        [HttpGet]
         public async Task<IActionResult> Usuarios()
         {
             return View(await _context.Usuarios.ToListAsync());
