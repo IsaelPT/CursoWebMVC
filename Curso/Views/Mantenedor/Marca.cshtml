@@ -2,12 +2,12 @@
 
 <ol class="breadcrumb mb-4 mt-3">
     <li class="breadcrumb-item"><a href="index.html">Mantenimiento</a></li>
-    <li class="breadcrumb-item active">Categorias</li>
+    <li class="breadcrumb-item active">Marcas</li>
 </ol>
 
 <div class="card">
     <div class="card-header">
-        <i class="fas fa-users me-1"></i> Lista de Marcas
+        <i class="fas fa-bookmark me-1"></i> Lista de Marcas
     </div>
 
     <div class="card-body">
@@ -64,7 +64,7 @@
             <div class="modal-body">
                 <div class="row  g-1">
 
-                    <input id="txtId"  />
+                    <input id="txtId"  type="hidden"/>
 
                     <div class="col-sm-6">
                         <label for="txtDescripcion" class="form-label">Descripcion</label>
@@ -167,7 +167,7 @@
             var id = $(this).data("index");
             swal({
                 title: "Estas Seguro?",
-                text: "Desea eliminar la Categoria?",
+                text: "Desea eliminar la Marca?",
                 type: "warning",
                 showCancelButton: true,
                 cancelButtonClass: "btn-danger",

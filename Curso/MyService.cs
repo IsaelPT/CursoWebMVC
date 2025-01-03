@@ -1,7 +1,10 @@
-﻿using AspNetCoreGeneratedDocument;
+﻿using System;
+using AspNetCoreGeneratedDocument;
 using Curso.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Curso
 {
@@ -197,6 +200,10 @@ namespace Curso
             {
                 mensaje = "La descripcion de la categoria no puede estar vacia";
             }
+            if (_context.Categoria.FirstOrDefault(e => e.Descripcion == obj.Descripcion) != null)
+            {
+                mensaje = "La categoria ya existe";
+            }
 
             if (string.IsNullOrEmpty(mensaje))
             {
@@ -230,6 +237,10 @@ namespace Curso
             if (string.IsNullOrEmpty(obj.Descripcion) || string.IsNullOrWhiteSpace(obj.Descripcion))
             {
                 mensaje = "La descripcion de la categoria no puede estar vacia";
+            }
+            if (_context.Categoria.FirstOrDefault(e => e.Descripcion == obj.Descripcion) != null)
+            {
+                mensaje = "La categoria ya existe";
             }
 
             if (string.IsNullOrEmpty(mensaje)) 
@@ -293,6 +304,7 @@ namespace Curso
             return resultado;
         }
 
+
         //CRUD de Marcas
         public int CrearMarca(Marca obj, out string mensaje)
         {
@@ -302,6 +314,10 @@ namespace Curso
             if (string.IsNullOrEmpty(obj.Descripcion) || string.IsNullOrWhiteSpace(obj.Descripcion))
             {
                 mensaje = "La descripcion de la categoria no puede estar vacia";
+            }
+            if (_context.Marcas.FirstOrDefault(e => e.Descripcion == obj.Descripcion) != null)
+            {
+                mensaje = "La marca ya existe";
             }
 
             if (string.IsNullOrEmpty(mensaje))
@@ -336,6 +352,10 @@ namespace Curso
             if (string.IsNullOrEmpty(obj.Descripcion) || string.IsNullOrWhiteSpace(obj.Descripcion))
             {
                 mensaje = "La descripcion de la categoria no puede estar vacia";
+            }
+            if (_context.Marcas.FirstOrDefault(e => e.Descripcion == obj.Descripcion) != null)
+            {
+                mensaje = "La marca ya existe";
             }
 
             if (string.IsNullOrEmpty(mensaje))
@@ -387,6 +407,201 @@ namespace Curso
                     _context.Marcas.Remove(marca);
                     _context.SaveChanges();
                     mensaje = "Categoria eliminada con exito";
+                    resultado = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                mensaje = ex.Message;
+                resultado = false;
+            }
+
+            return resultado;
+        }
+
+
+        //CRUD de Productos
+        public int CrearProducto([FromForm] Producto obj, out string mensaje)
+        {
+            mensaje = string.Empty;
+            Producto producto;
+
+            if (string.IsNullOrEmpty(obj.Descripcion) || string.IsNullOrWhiteSpace(obj.Descripcion))
+            {
+                mensaje = "La descripcion del producto no puede estar vacia";
+            }
+            else if (string.IsNullOrEmpty(obj.Nombre) || string.IsNullOrWhiteSpace(obj.Nombre))
+            {
+                mensaje = "El nombre del producto no puede estar vacia";
+            }
+            else if (_context.Productos.FirstOrDefault(e => e.Descripcion == obj.Descripcion) != null)
+            {
+                mensaje = "El producto ya existe";
+            }
+            else if (obj.IdMarca == 0) 
+            {
+                mensaje = "Debe seleccionar una marca";            
+            }
+            else if (obj.IdCategoria == 0)
+            {
+                mensaje = "Debe seleccionar una categoria";
+            }
+            else if (obj.Precio == 0)
+            {
+                mensaje = "Debe ingresar el precio del producto";
+            }
+            else if (obj.Stock == 0)
+            {
+                mensaje = "Debe ingresar el stock del producto";
+            }
+
+            if (string.IsNullOrEmpty(mensaje))
+            {
+                producto = new Producto
+                {
+                    Nombre = obj.Nombre,
+                    Descripcion = obj.Descripcion,
+                    IdMarca = obj.IdMarcaNavigation.IdMarca,
+                    IdCategoria = obj.IdCategoriaNavigation.IdCategoria,
+                    Precio = obj.Precio,
+                    Stock = obj.Stock,
+                    Activo = obj.Activo
+                };
+                try
+                {
+                    _context.Productos.Add(producto);
+                    _context.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    mensaje = ex.Message;
+                }
+            }
+            else
+            {
+                return 0;
+            }
+            return producto.IdProducto;
+        }
+
+        public bool ActulizarProducto(Producto obj, out string mensaje)
+        {
+            mensaje = string.Empty;
+            bool resultado;
+
+            if (string.IsNullOrEmpty(obj.Descripcion) || string.IsNullOrWhiteSpace(obj.Descripcion))
+            {
+                mensaje = "La descripcion del producto no puede estar vacia";
+            }
+            else if (string.IsNullOrEmpty(obj.Nombre) || string.IsNullOrWhiteSpace(obj.Nombre))
+            {
+                mensaje = "El nombre del producto no puede estar vacia";
+            }
+            else if (_context.Productos.FirstOrDefault(e => e.Descripcion == obj.Descripcion && e.IdProducto != obj.IdProducto) != null)
+            {
+                mensaje = "El producto ya existe";
+            }
+            else if (obj.IdMarca == 0)
+            {
+                mensaje = "Debe seleccionar una marca";
+            }
+            else if (obj.IdCategoria == 0)
+            {
+                mensaje = "Debe seleccionar una categoria";
+            }
+            else if (obj.Precio == 0)
+            {
+                mensaje = "Debe ingresar el precio del producto";
+            }
+            else if (obj.Stock == 0)
+            {
+                mensaje = "Debe ingresar el stock del producto";
+            }
+
+            if (string.IsNullOrEmpty(mensaje))
+            {
+                try
+                {
+                    var producto_existente = _context.Productos.Find(obj.IdProducto);
+                    if (producto_existente != null)
+                    {
+                        producto_existente.Nombre = obj.Nombre;
+                        producto_existente.Descripcion = obj.Descripcion;
+                        producto_existente.IdMarca = obj.IdMarca;
+                        producto_existente.IdCategoria = obj.IdCategoria;
+                        producto_existente.Precio = obj.Precio;
+                        producto_existente.Stock = obj.Stock;
+                        producto_existente.Activo = obj.Activo;
+                        _context.SaveChanges();
+                        resultado = true;
+                    }
+                    else
+                    {
+                        mensaje = "El producto no existe";
+                        resultado = false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    resultado = false;
+                    mensaje = ex.Message;
+                }
+            }
+            else
+            {
+                resultado = false;
+            }
+            return resultado;
+        }
+
+        public bool GuardarDatosImagen(Producto obj, out string mensaje)
+        {
+            bool resultado = false;
+            mensaje = string.Empty;
+
+            try
+            {
+                var producto_existente = _context.Productos.Find(obj.IdProducto);
+                if (producto_existente != null)
+                {
+                    producto_existente.RutaImagen = obj.RutaImagen;
+                    producto_existente.NombreImagen = obj.NombreImagen;
+                    _context.SaveChanges();
+                    resultado = true;
+                }
+                else
+                {
+                    mensaje = "El producto no existe";
+                    resultado = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                resultado = false;
+                mensaje = ex.Message;
+            }
+
+            return resultado;
+        }
+
+        public bool EliminarProducto(int id, out string mensaje)
+        {
+            var resultado = false;
+            mensaje = string.Empty;
+
+            try
+            {
+                var producto = _context.Productos.Find(id);
+                if (producto == null)
+                {
+                    resultado = false;
+                    mensaje = "El producto no existe";
+                }
+                else
+                {
+                    _context.Productos.Remove(producto);
+                    _context.SaveChanges();
+                    mensaje = "Producto eliminado con exito";
                     resultado = true;
                 }
             }

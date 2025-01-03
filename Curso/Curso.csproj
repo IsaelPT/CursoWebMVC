@@ -19,4 +19,9 @@
     <PackageReference Include="SweetAlert.Bootstrap" Version="1.0.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\NewFolder\" />
+    <Folder Include="wwwroot\servidor de fotos\" />
+  </ItemGroup>
+
 </Project>

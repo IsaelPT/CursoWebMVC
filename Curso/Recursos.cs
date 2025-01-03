@@ -60,5 +60,22 @@ namespace Curso
                 return sb.ToString();
             }
         }
+
+        public static string ConvertToBase64(string path)
+        {
+            string txtBase64 = string.Empty;
+
+            try
+            {
+                byte[] bytes = File.ReadAllBytes(path);
+                txtBase64 = Convert.ToBase64String(bytes);
+            }
+            catch (Exception ex)
+            {
+                txtBase64 = string.Empty;
+            }
+
+            return txtBase64;
+        }
     }
 }

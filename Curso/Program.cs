@@ -1,5 +1,7 @@
+using System.Globalization;
 using Curso;
 using Curso.Models;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,7 @@ builder.Services.AddDbContext<DbcarritoContext>(options =>
 });
 //builder.Services.AddScoped<IMyService, MyService>();
 builder.Services.AddTransient<MyService>();
+
 
 var app = builder.Build();
 

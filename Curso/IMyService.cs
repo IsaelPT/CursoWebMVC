@@ -14,5 +14,9 @@ namespace Curso
         public int CrearMarca(Marca obj, out string mensaje);
         public bool ActulizarMarca(Marca obj, out string mensaje);
         public bool EliminarMarca(int id, out string mensaje);
+        public int CrearProducto(Producto obj, out string mensaje);
+        public bool ActulizarProducto(Producto obj, out string mensaje);
+        public bool GuardarDatosImagen(Producto obj, out string mensaje);
+        public bool EliminarProducto(int id, out string mensaje);
     }
 }
