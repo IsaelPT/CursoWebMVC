@@ -109,6 +109,10 @@
 @section Scripts
 {
     <script>
+        var tabla = $("#table").DataTable({
+            responsive:true,
+            ordering:false
+        });
         function abrirModal(usuario){
 
             $('#txtId').val(0)

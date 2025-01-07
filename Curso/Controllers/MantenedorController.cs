@@ -139,7 +139,9 @@ namespace Curso.Controllers
         #region Productos
         public async Task<IActionResult> Producto()
         {
-            var productos = _context.Productos.Include(p => p.IdMarcaNavigation).Include(p => p.IdCategoriaNavigation).Select(p => new ProductoViewModels
+            var productos = _context.Productos.Include(p => p.IdMarcaNavigation).
+                Include(p => p.IdCategoriaNavigation).
+                Select(p => new ProductoDTS
             {
                 IdProducto = p.IdProducto,
                 Nombre = p.Nombre,

@@ -7,7 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\NewFolder\**" />
+    <Content Remove="Models\NewFolder\**" />
+    <EmbeddedResource Remove="Models\NewFolder\**" />
+    <None Remove="Models\NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="bootstrap" Version="5.3.3" />
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
     <PackageReference Include="Font.Awesome" Version="5.15.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
@@ -20,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\NewFolder\" />
+    <Folder Include="wwwroot\lib\DataTables\" />
     <Folder Include="wwwroot\servidor de fotos\" />
   </ItemGroup>
 

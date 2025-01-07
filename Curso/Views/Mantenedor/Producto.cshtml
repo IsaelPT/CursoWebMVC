@@ -1,5 +1,5 @@
 ﻿@using Curso.Models.NewFolder1
-@model List<ProductoViewModels>
+@model List<ProductoDTS>
 
 <ol class="breadcrumb mb-4 mt-3">
     <li class="breadcrumb-item"><a href="index.html">Mantenimiento</a></li>
@@ -154,7 +154,12 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    
     <script>
+        var tabla = $("#table").DataTable({
+            responsive:true,
+            ordering:false
+        });
         
         function mostrarImagen(input){
             if(input.files) {

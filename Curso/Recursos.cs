@@ -77,5 +77,6 @@ namespace Curso
 
             return txtBase64;
         }
+
     }
 }

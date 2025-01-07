@@ -1,8 +1,167 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<h1 class="mt-4">Dashboard</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">Dashboard</li>
+</ol>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-primary text-white mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-9">
+                        <h6>Clientes</h6>
+                        <h6 id="totalclientes">0</h6>
+                    </div>
+                    <div class="col-sm-3">
+                        <i class="fas fa-user fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-warning text-white mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-9">
+                        <h6>Cantidad de Ventas</h6>
+                        <h6 id="totalventas">0</h6>
+                    </div>
+                    <div class="col-sm-3">
+                        <i class="fas fa-shopping-bag fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card bg-success text-white mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-9">
+                        <h6>Cantidad de Productos</h6>
+                        <h6 id="totalproductos">0</h6>
+                    </div>
+                    <div class="col-sm-3">
+                        <i class="fas fa-boxes fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-tags me-1"></i>
+        Historial de ventas
+    </div>
+    <div class="card-body">
+        <form asp-action="Exportar">
+            <div class="row align-items-end">
+                <div class="col-sm-2">
+                    <div class="mb-2">
+                        <label class="form-label">Fecha de Inicio:</label>
+                        <input class="form-control" type="text" id="txtFechainicio" name="FechaInicio" />
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="mb-2">
+                        <label class="form-label">Fecha Fin:</label>
+                        <input class="form-control" type="text" id="txtFechafin" name="FechaFin" />
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="mb-2">
+                        <label class="form-label">ID Transaccion:</label>
+                        <input class="form-control" type="text" id="txtTransaccion" name="Transaccion" />
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="d-grid mb-2">
+                        <button class="btn btn-primary" id="btnBuscar" type="button"><i class="fas fa-search"></i> Buscar</button>
+                    </div>
+                </div>
+                <div class="col-sm-2">
+                    <div class="d-grid mb-2">
+                        <button class="btn btn-success" type="submit"><i class="fas fa-file-excel"></i> Exportar </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <hr />
+        <div class="row">
+            <div class="col-sm-12">
+                <table id="table" class="display cell-border" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Fecha Venta</th>
+                            <th>Cliente</th>
+                            <th>Producto</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Total</th>
+                            <th>ID Transaccion</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        var tabla;
+
+        $("#txtFechainicio").datepicker({dateFormat: "dd/mm/yy"}).datepicker("setDate", new Date())
+        $("#txtFechafin").datepicker({dateFormat: "dd/mm/yy"}).datepicker("setDate", new Date())
+
+        jQuery.ajax({
+            url:'@Url.Action("Cantidades","Home")',
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json",
+            success: function(response){
+                $("#totalclientes").text(response.cantClientes);
+                $("#totalproductos").text(response.cantProductos);
+                $("#totalventas").text(response.cantVentas);
+            }
+        })
+        
+        var URL = '@Url.Action("Reporte","Home")' +
+                '?fechaInicio='+$('#txtFechainicio').val()+
+                '&fechaFin='+$('#txtFechafin').val()+
+                '&idTransaccion='+$('#txtTransaccion').val()
+        tabla = $("#table").DataTable({
+            responsive: true,
+            ordering: false,
+            "ajax" : {
+                url: URL,
+                type: 'GET',
+                dataType: 'json'
+            },
+            "columns":[
+                {"data":"FechaVenta"},
+                {"data":"Cliente"},
+                {"data":"Producto"},
+                {"data":"Precio"},
+                {"data":"Cantidad"},
+                {"data":"Total"},
+                {"data":"IdTransaccion"}
+            ]
+        })
+
+        $("#btnBuscar").on("click", function(){
+            var nueva_URL = '@Url.Action("Reporte", "Home")' +
+                '?fechaInicio='+$('#txtFechainicio').val()+
+                '&fechaFin='+$('#txtFechafin').val()+
+                '&idTransaccion='+$('#txtTransaccion').val()
+            tabla.ajax.url(nueva_URL).load();
+        })
+    </script>
+}

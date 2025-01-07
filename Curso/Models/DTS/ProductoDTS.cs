@@ -2,7 +2,7 @@
 
 namespace Curso.Models.NewFolder1
 {
-    public class ProductoViewModels
+    public class ProductoDTS
     {
         public int IdProducto { get; set; }
         [Required]
